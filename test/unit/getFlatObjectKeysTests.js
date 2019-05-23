@@ -27,9 +27,7 @@ suite('getFlatObjectKeys', () => {
     const flattenedObjectKeys = getFlatObjectKeys({
       from: {
         foo: 23,
-        bar: {
-          baz: 42
-        }
+        bar: { baz: 42 }
       }
     });
 
@@ -40,9 +38,7 @@ suite('getFlatObjectKeys', () => {
     const flattenedObjectKeys = getFlatObjectKeys({
       from: {
         foo: null,
-        bar: {
-          baz: null
-        }
+        bar: { baz: null }
       }
     });
 
@@ -53,44 +49,97 @@ suite('getFlatObjectKeys', () => {
     const flattenedObjectKeys = getFlatObjectKeys({
       from: {
         foo: [],
-        bar: {
-          baz: [ 23, 42 ]
-        }
+        bar: { baz: [ 23, 42 ]}
       }
     });
 
     assert.that(flattenedObjectKeys).is.equalTo([ 'foo', 'bar', 'bar.baz' ]);
   });
 
-  test('excludes the given keys.', async () => {
-    const flattenedObjectKeys = getFlatObjectKeys({
-      from: {
-        foo: 23,
-        bar: {
-          baz: 42
-        }
-      },
-      excludes: [
-        'bar.baz'
-      ]
+  suite('excludes', () => {
+    test('excludes the given keys.', async () => {
+      const flattenedObjectKeys = getFlatObjectKeys({
+        from: {
+          foo: 23,
+          bar: { baz: 42 }
+        },
+        excludes: [ 'bar.baz' ]
+      });
+
+      assert.that(flattenedObjectKeys).is.equalTo([ 'foo', 'bar' ]);
     });
 
-    assert.that(flattenedObjectKeys).is.equalTo([ 'foo', 'bar' ]);
-  });
+    test('excludes keys and their nested properties.', async () => {
+      const flattenedObjectKeys = getFlatObjectKeys({
+        from: {
+          foo: 23,
+          bar: { baz: 42 }
+        },
+        excludes: [ 'bar' ]
+      });
 
-  test('excludes keys and their nested properties.', async () => {
-    const flattenedObjectKeys = getFlatObjectKeys({
-      from: {
-        foo: 23,
-        bar: {
-          baz: 42
-        }
-      },
-      excludes: [
-        'bar'
-      ]
+      assert.that(flattenedObjectKeys).is.equalTo([ 'foo' ]);
     });
 
-    assert.that(flattenedObjectKeys).is.equalTo([ 'foo' ]);
+    test('correctly handles the beginning of words.', async () => {
+      const flattenedObjectKeys = getFlatObjectKeys({
+        from: {
+          foo: 23,
+          bar: { baz: 42 }
+        },
+        excludes: [ 'bar.b' ]
+      });
+
+      assert.that(flattenedObjectKeys).is.equalTo([ 'foo', 'bar', 'bar.baz' ]);
+    });
+
+    test('supports wildcards.', async () => {
+      const flattenedObjectKeys = getFlatObjectKeys({
+        from: {
+          foo: 23,
+          bar: { baz: 42 }
+        },
+        excludes: [ 'bar.*' ]
+      });
+
+      assert.that(flattenedObjectKeys).is.equalTo([ 'foo', 'bar' ]);
+    });
+
+    test('supports wildcards with nesting.', async () => {
+      const flattenedObjectKeys = getFlatObjectKeys({
+        from: {
+          foo: 23,
+          bar: { baz: { bas: 42 }}
+        },
+        excludes: [ 'bar.*' ]
+      });
+
+      assert.that(flattenedObjectKeys).is.equalTo([ 'foo', 'bar' ]);
+    });
+
+    test('supports wildcards on nested levels.', async () => {
+      const flattenedObjectKeys = getFlatObjectKeys({
+        from: {
+          foo: 23,
+          bar: { baz: { bas: 42 }}
+        },
+        excludes: [ 'bar.baz.*' ]
+      });
+
+      assert.that(flattenedObjectKeys).is.equalTo([ 'foo', 'bar', 'bar.baz' ]);
+    });
+
+    test('correctly uses wildcards with beginnings of words.', async () => {
+      const flattenedObjectKeys = getFlatObjectKeys({
+        from: {
+          foo: 23,
+          bar: { baz: 42 },
+          barX: 65
+        },
+        excludes: [ 'bar.*' ]
+      });
+
+      assert.that(flattenedObjectKeys).is.equalTo([ 'foo', 'bar', 'barX' ]);
+    });
   });
 });

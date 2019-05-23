@@ -53,6 +53,25 @@ console.log(flattenedObjectKeys);
 // => [ 'a', 'b' ]
 ```
 
+If you want to exclude all properties of a given path, you may also use the `*` character as a wildcard:
+
+```javascript
+const value = {
+  a: 23,
+  b: {
+    c: 42
+  }
+};
+
+const flattenedObjectKeys = getFlatObjectKeys({
+  from: value,
+  excludes: [ 'b.*' ]
+});
+
+console.log(flattenedObjectKeys);
+// => [ 'a', 'b' ]
+```
+
 ## Running the build
 
 To build this module use [roboter](https://www.npmjs.com/package/roboter).
