@@ -1,6 +1,6 @@
 {
   "name": "flat-object-keys",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "flat-object-keys returns the flattened keys from an object.",
   "contributors": [
     {
